@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Page</title>
+</head>
+<body>
+<div>
+    <h2>Delete</h2><br/><br/>
+
+    <tr th:each="notice : ${noticeList}">
+        <td th:text="${notice.seq}"></td>
+        <td th:text="${notice.name}"></td>
+        <td th:text="${notice.price}"></td>
+        <td th:text="${notice.quantity}"></td>
+        <td th:text="${notice.quantity}"></td>
+    </tr>
+</div>
+
+<hr>
+
+<script>
+    async function deleteNotice() {
+
+
+        try {
+            await fetch("/api/users/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                }),
+            }).then((response) => {
+                if (response.status === 200) {
+                    location.href = "/"
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+</script>
+</body>
+</html>
+
+

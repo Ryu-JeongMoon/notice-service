@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Page</title>
+</head>
+<body>
+<div>
+    <h2>Create</h2><br/><br/>
+    <div>
+        <label for="title">title:</label>
+        <input type="text" id="title">
+    </div>
+    <div>
+        <label for="content">content:</label>
+        <input type="text" id="content">
+    </div>
+    <div>
+        <label for="startDateTime">startDateTime:</label>
+        <input type="datetime-local" id="startDateTime">
+    </div>
+    <div>
+        <label for="endDateTime">endDateTime:</label>
+        <input type="datetime-local" id="endDateTime">
+    </div>
+    <div>
+        <label for="files">files:</label>
+        <input type="text" id="files">
+    </div>
+    <div>
+        <button type="button" onclick="create()">Create</button>
+    </div>
+</div>
+
+<hr>
+
+<script>
+    async function create() {
+        const title = document.getElementById("title").value;
+        const content = document.getElementById("content").value;
+        const startDateTime = document.getElementById("startDateTime").value;
+        const endDateTime = document.getElementById("endDateTime").value;
+        const files = document.getElementById("files").value;
+
+        try {
+            await fetch("/api/notices", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: title,
+                    content: content,
+                    startDateTime: startDateTime,
+                    endDateTime: endDateTime,
+                    files: files
+                }),
+            }).then((response) => {
+                if (response.status === 200) {
+                    location.href = "/"
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+</script>
+</body>
+</html>
