@@ -2,48 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Delete Page</title>
+    <title>List Page</title>
 </head>
 <body>
 <div>
-    <h2>Delete</h2><br/><br/>
-
-    <tr th:each="notice : ${noticeList}">
-        <td th:text="${notice.seq}"></td>
-        <td th:text="${notice.name}"></td>
-        <td th:text="${notice.price}"></td>
-        <td th:text="${notice.quantity}"></td>
-        <td th:text="${notice.quantity}"></td>
-    </tr>
+    <h2>Get List</h2><br/><br/>
+    <div>
+        <table>
+            <thead>
+            <tr>
+                <th>sequence.</th>
+                <th>title.</th>
+                <th>content</th>
+                <th>createdDateTime</th>
+                <th>hit</th>
+                <th>username</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="notice : ${noticeList}">
+                <td th:text="${notice.id}"></td>
+                <td><a th:text="${notice.title}" th:onclick="|javascript:getOne('${notice.id}')|"></a></td>
+                <td th:text="${notice.content}"></td>
+                <td th:text="${notice.createdDateTime}"></td>
+                <td th:text="${notice.hit}"></td>
+                <td th:text="${notice.username}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <hr>
 
 <script>
-    async function deleteNotice() {
-
-
-        try {
-            await fetch("/api/users/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password
-                }),
-            }).then((response) => {
-                if (response.status === 200) {
-                    location.href = "/"
-                }
-            });
-        } catch (error) {
-            console.log(error);
-        }
+    function getOne(noticeId) {
+        location.href = '/notices/' + noticeId;
     }
 </script>
 </body>
+<style>
+    a:link {
+        color: red;
+        text-decoration: none;
+    }
+
+    a:visited {
+        color: black;
+        text-decoration: none;
+    }
+
+    a:hover {
+        color: blue;
+        text-decoration: underline;
+    }
+</style>
 </html>
 
 

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Get One</title>
+</head>
+<body>
+<div>
+    <h2>Get One</h2><br/><br/>
+    <div>
+        <table>
+            <thead>
+            <tr>
+                <th>sequence.</th>
+                <th>title.</th>
+                <th>content</th>
+                <th>createdDateTime</th>
+                <th>hit</th>
+                <th>username</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td id="id" th:text="${notice.id}"></td>
+                <td id="title" th:text="${notice.title}"></td>
+                <td id="content" th:text="${notice.content}"></td>
+                <td id="createdDateTime" th:text="${notice.createdDateTime}"></td>
+                <td id="hit" th:text="${notice.hit}"></td>
+                <td id="username" th:text="${notice.username}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <button onclick="editNotice()">Edit</button>
+    <button onclick="deleteNotice()">Delete</button>
+</div>
+
+<hr>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let noticeId = /*[[ ${notice.id} ]]*/;
+    /*]]*/
+
+    function editNotice() {
+        location.href='/notices/edit/' + noticeId;
+    }
+
+    async function deleteNotice() {
+        if (confirm('정말 삭제하시겠습니까?')) {
+            try {
+                await fetch("/api/notices/" + noticeId, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }).then((response) => {
+                    if (response.status === 204) {
+                        location.href = "/notices"
+                    }
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+
+    function getOne(noticeId) {
+        location.href = '/notices/' + noticeId;
+    }
+</script>
+</body>
+</html>
+
+

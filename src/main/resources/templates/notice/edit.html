@@ -8,44 +8,72 @@
 <div>
     <h2>Edit</h2><br/><br/>
     <div>
-        <label for="username">username:</label>
-        <input type="text" id="username">
+        <div>
+            <label for="id">notice-id</label>
+            <input id="id" th:placeholder="${notice.id}" disabled>
+        </div>
+        <div>
+            <label for="title">title:</label>
+            <input id="title" th:placeholder="${notice.title}">
+        </div>
+        <div>
+            <label for="content">content:</label>
+            <input id="content" th:placeholder="${notice.content}"/>
+        </div>
+        <div>
+            <label for="createdDateTime">createdDateTime</label>
+            <input id="createdDateTime" th:placeholder="${notice.createdDateTime}" disabled/>
+        </div>
+        <div>
+            <label for="hit">hit</label>
+            <input id="hit" th:placeholder="${notice.hit}" disabled/>
+        </div>
+        <div>
+            <label for="username">username:</label>
+            <input id="username" th:placeholder="${notice.username}" disabled/>
+        </div>
+
     </div>
-    <div>
-        <label for="password">password:</label>
-        <input type="password" id="password">
-    </div>
-    <div>
-        <button type="button" onclick="login()">Edit</button>
-    </div>
+    <button onclick="editNotice()">Edit</button>
+    <button onclick="deleteNotice()">Delete</button>
 </div>
 
 <hr>
 
-<script>
-    async function login() {
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let noticeId = /*[[ ${notice.id} ]]*/;
 
-        try {
-            await fetch("/api/users/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password
-                }),
-            }).then((response) => {
-                if (response.status === 200) {
-                    location.href = "/"
-                }
-            });
-        } catch (error) {
-            console.log(error);
+    /*]]*/
+
+    function editNotice() {
+        location.href = '/notices/edit/' + noticeId;
+    }
+
+    async function deleteNotice() {
+        if (confirm('정말 삭제하시겠습니까?')) {
+            try {
+                await fetch("/api/notices/" + noticeId, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }).then((response) => {
+                    if (response.status === 204) {
+                        location.href = "/notices"
+                    }
+                });
+            } catch (error) {
+                console.log(error);
+            }
         }
+    }
+
+    function getOne(noticeId) {
+        location.href = '/notices/' + noticeId;
     }
 </script>
 </body>
 </html>
+
+

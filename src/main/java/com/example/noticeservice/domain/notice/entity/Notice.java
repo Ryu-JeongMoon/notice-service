@@ -1,10 +1,10 @@
 package com.example.noticeservice.domain.notice.entity;
 
-import com.example.noticeservice.domain.file.Files;
 import com.example.noticeservice.util.BaseEntity;
 import java.time.LocalDateTime;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import lombok.Builder;
@@ -30,9 +30,10 @@ public class Notice extends BaseEntity {
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
 
+    @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
-//    @Embedded
+    //    @_embedded
     private String files;
 
     private int hit;
@@ -52,5 +53,9 @@ public class Notice extends BaseEntity {
 
     public void changeStatus() {
         this.status = Status.INACTIVE;
+    }
+
+    public void increaseHit() {
+        this.hit++;
     }
 }

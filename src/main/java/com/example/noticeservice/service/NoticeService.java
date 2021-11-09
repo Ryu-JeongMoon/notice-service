@@ -1,6 +1,7 @@
 package com.example.noticeservice.service;
 
 import com.example.noticeservice.domain.notice.entity.Notice;
+import com.example.noticeservice.domain.notice.entity.Status;
 import com.example.noticeservice.domain.notice.entity.dto.request.NoticeRequest;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
 import com.example.noticeservice.domain.notice.mapper.NoticeRequestMapper;
@@ -10,7 +11,6 @@ import com.example.noticeservice.util.Messages;
 import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,17 +23,23 @@ public class NoticeService {
     private final NoticeRequestMapper requestMapper;
     private final NoticeResponseMapper responseMapper;
 
-//    @Cacheable
+    // 대용량 트래픽을 처리하기 위한 Redis 도입 예정
+    //@Cacheable
     @Transactional(readOnly = true)
     public List<NoticeResponse> getNotices(Pageable pageable) {
-        List<Notice> noticeList = noticeRepository.findByPage(pageable);
+        List<Notice> noticeList = noticeRepository.findByPageAndStatus(pageable, Status.ACTIVE);
         List<NoticeResponse> noticeResponseList = responseMapper.toDtoList(noticeList);
         return noticeResponseList;
     }
 
-    @Transactional(readOnly = true)
+    // 조회수 증가를 위해 Query + Command 형태
+    @Transactional
     public NoticeResponse getNotice(Long id) {
-        return noticeRepository.findById(id)
+        return noticeRepository.findByIdAndStatus(id, Status.ACTIVE)
+            .map(notice -> {
+                notice.increaseHit();
+                return notice;
+            })
             .map(responseMapper::toDto)
             .orElseThrow(() -> new EntityNotFoundException(Messages.BOARD_NOT_FOUND));
     }
