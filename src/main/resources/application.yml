@@ -25,6 +25,11 @@ spring:
     port: 6379
     host: localhost
 
+  session:
+    store-type: redis
+    redis:
+      flush-mode: on_save
+
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -32,6 +37,13 @@ spring:
 
   devtools:
     livereload:
+      enabled: true
+
+  servlet:
+    multipart:
+      file-size-threshold: 1
+      max-file-size: 10
+      max-request-size: 30
       enabled: true
 
 logging:

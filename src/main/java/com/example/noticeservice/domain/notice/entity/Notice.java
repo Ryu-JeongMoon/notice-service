@@ -1,12 +1,21 @@
 package com.example.noticeservice.domain.notice.entity;
 
+import com.example.noticeservice.domain.file.entity.Image;
+import com.example.noticeservice.domain.user.entity.User;
 import com.example.noticeservice.util.BaseEntity;
 import java.time.LocalDateTime;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,32 +31,51 @@ public class Notice extends BaseEntity {
 
     @Id
     @GeneratedValue
+    @Column(name = "notice_id")
     private Long id;
 
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
     private LocalDateTime startDateTime;
+
+    @Column(nullable = false)
     private LocalDateTime endDateTime;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
-    //    @_embedded
-    private String files;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Image> images;
 
     private int hit;
 
     @Builder
-    public Notice(String title, String content, LocalDateTime startDateTime, LocalDateTime endDateTime, String files) {
+    public Notice(String title, String content, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         this.title = title;
         this.content = content;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-        this.files = files;
 
         if (startDateTime.isAfter(endDateTime)) {
             throw new IllegalArgumentException("공지 시작일시는 종료일시보다 늦을 수 없습니다");
+        }
+    }
+
+    public void addImage(Image image) {
+        images.add(image);
+
+        if (image.getNotice() != this) {
+            image.setNotice(this);
         }
     }
 

@@ -2,6 +2,7 @@ package com.example.noticeservice.controller.api;
 
 import com.example.noticeservice.domain.user.entity.dto.request.UserRequest;
 import com.example.noticeservice.service.UserService;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class UserApiController {
     private final UserService userService;
 
     @PostMapping
-//    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("isAnonymous()")
     public ResponseEntity signup(@Valid @RequestBody UserRequest userRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult);
@@ -32,13 +33,14 @@ public class UserApiController {
     }
 
     @PostMapping("/login")
-//    @PreAuthorize("isAnonymous()")
-    public ResponseEntity login(@Valid @RequestBody UserRequest userRequest, BindingResult bindingResult) {
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity login(@Valid @RequestBody UserRequest userRequest, BindingResult bindingResult, HttpSession session) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult);
         }
 
         userService.login(userRequest);
+        session.setAttribute("username", userRequest.getUsername());
         return ResponseEntity.ok().build();
     }
 }

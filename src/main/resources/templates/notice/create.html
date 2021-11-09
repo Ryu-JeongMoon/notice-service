@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Create Page</title>
@@ -7,29 +7,27 @@
 <body>
 <div>
     <h2>Create</h2><br/><br/>
-    <div>
-        <label for="title">title:</label>
-        <input type="text" id="title">
-    </div>
-    <div>
-        <label for="content">content:</label>
-        <input type="text" id="content">
-    </div>
-    <div>
-        <label for="startDateTime">startDateTime:</label>
-        <input type="datetime-local" id="startDateTime">
-    </div>
-    <div>
-        <label for="endDateTime">endDateTime:</label>
-        <input type="datetime-local" id="endDateTime">
-    </div>
-    <div>
-        <label for="files">files:</label>
-        <input type="text" id="files">
-    </div>
-    <div>
-        <button type="button" onclick="create()">Create</button>
-    </div>
+    <form th:action="@{/api/notices}" th:object="${noticeImageRequest}" enctype="multipart/form-data" method="post" novalidate>
+        <div class="form-group">
+            <p>title: <input type="text" th:field="*{title}"></p>
+        </div>
+        <div class="form-group">
+            <p>content: <input type="text" th:field="*{content}"></p>
+        </div>
+        <div class="form-group">
+            <p>startDateTime: <input type="datetime-local" th:field="*{startDateTime}"></p>
+        </div>
+        <div class="form-group">
+            <p>endDateTime: <input type="datetime-local" th:field="*{endDateTime}"></p>
+        </div>
+        <div class="form-group">
+            <p>files: <input type="file" multiple="multiple" th:field="*{files}"></p>
+        </div>
+        <div class="form-group">
+            <button type="button" onclick="create()">Create</button>
+            <button type="submit">Submit</button>
+        </div>
+    </form>
 </div>
 
 <hr>
@@ -45,8 +43,9 @@
         try {
             await fetch("/api/notices", {
                 method: "POST",
+                enctype: 'multipart/form-data',
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "multipart/form-data",
                 },
                 body: JSON.stringify({
                     title: title,
@@ -57,7 +56,7 @@
                 }),
             }).then((response) => {
                 if (response.status === 200) {
-                    location.href = "/"
+                    location.href = "/notices"
                 }
             });
         } catch (error) {

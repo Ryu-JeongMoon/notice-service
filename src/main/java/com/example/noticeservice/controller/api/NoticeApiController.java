@@ -3,12 +3,15 @@ package com.example.noticeservice.controller.api;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import com.example.noticeservice.domain.notice.entity.dto.request.NoticeImageRequest;
 import com.example.noticeservice.domain.notice.entity.dto.request.NoticeRequest;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
 import com.example.noticeservice.service.NoticeService;
 import java.util.List;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -17,16 +20,20 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,13 +51,18 @@ public class NoticeApiController {
         return ResponseEntity.ok(entityModels);
     }
 
-    @PostMapping
-    public ResponseEntity createNotice(@Valid @RequestBody NoticeRequest noticeRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult);
-        }
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity createNotice(@ModelAttribute(value = "noticeImageRequest") NoticeImageRequest noticeImageRequest,
+        HttpSession session) throws Exception {
+//        if (bindingResult.hasErrors()) {
+//            return ResponseEntity.badRequest().body(bindingResult);
+//        }
+        System.out.println("noticeImageRequest = " + noticeImageRequest);
 
-        noticeService.create(noticeRequest);
+        NoticeRequest noticeRequest = noticeImageRequest.toNoticeRequest();
+        List<MultipartFile> files = noticeImageRequest.getFiles();
+
+        noticeService.create(noticeRequest, files, session);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -65,13 +77,17 @@ public class NoticeApiController {
     }
 
     @PatchMapping("/{noticeId}")
-    public ResponseEntity editNotice(
-        @PathVariable Long noticeId, @Valid @RequestBody NoticeRequest noticeRequest, BindingResult bindingResult) {
+    public ResponseEntity editNotice(@PathVariable Long noticeId, @Valid @RequestPart NoticeImageRequest noticeImageRequest,
+        BindingResult bindingResult) throws Exception {
+
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult);
         }
 
-        noticeService.edit(noticeId, noticeRequest);
+        NoticeRequest noticeRequest = noticeImageRequest.toNoticeRequest();
+        List<MultipartFile> files = noticeImageRequest.getFiles();
+
+        noticeService.edit(noticeId, noticeRequest, files);
         Link link = linkTo(
             methodOn(NoticeApiController.class).getNotice(noticeId)).withSelfRel();
 
