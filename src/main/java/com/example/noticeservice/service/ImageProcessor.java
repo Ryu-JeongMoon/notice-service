@@ -1,12 +1,12 @@
 package com.example.noticeservice.service;
 
-import com.example.noticeservice.domain.file.entity.Image;
+import com.example.noticeservice.domain.image.entity.Image;
 import com.example.noticeservice.util.Messages;
 import java.io.File;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,28 +20,32 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ImageProcessor {
 
-    private final ImageService imageService;
     private static final String ABSOLUTE_PATH = new File("").getAbsolutePath() + File.separator + File.separator;
+    private final ImageService imageService;
 
     public List<Image> parse(List<MultipartFile> files) throws Exception {
         List<Image> imageList = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(files)) {
-            throw new IllegalArgumentException();
+            log.warn("FAILED :: There is no files");
+            return Collections.emptyList();
         }
 
-        String currentDateTimeString = getCurrentDateTimeString();
-        String path = "images" + File.separator + currentDateTimeString;
+        String currentDateString = getCurrentDateString();
+        String path = "images" + File.separator + currentDateString;
         File file = new File(path);
 
         checkFileExistence(file);
 
         for (MultipartFile multipartFile : files) {
+            String currentDateTimeString = getCurrentDateTimeString();
+
             String contentType = multipartFile.getContentType();
             String originalFilename = multipartFile.getOriginalFilename();
             String originalFileNameWithoutExtension = originalFilename.substring(0, originalFilename.indexOf("."));
 
             checkFileExtension(multipartFile, contentType);
+
             String originalFileExtension = getOriginalFileExtension(contentType);
             String fileName = currentDateTimeString + originalFileNameWithoutExtension + originalFileExtension;
 
@@ -89,8 +93,13 @@ public class ImageProcessor {
         }
     }
 
+    private String getCurrentDateString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        return LocalDateTime.now().format(formatter);
+    }
+
     private String getCurrentDateTimeString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd-hhmmss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-hhmmss");
         return LocalDateTime.now().format(formatter);
     }
 }

@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+// multipart/form-data 로 넘어오는 경우 String 으로 binding, 따라서 String -> LocalDateTime 변환 필요
 @Data
 @Builder
 @NoArgsConstructor
@@ -33,6 +34,13 @@ public class NoticeImageRequest {
             .content(content)
             .startDateTime(LocalDateTime.parse(startDateTime, formatter))
             .endDateTime(LocalDateTime.parse(endDateTime, formatter))
+            .build();
+    }
+
+    public NoticeRequest toEditNoticeRequest() {
+        return NoticeRequest.builder()
+            .title(title)
+            .content(content)
             .build();
     }
 }

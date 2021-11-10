@@ -8,10 +8,8 @@ import com.example.noticeservice.domain.notice.entity.dto.request.NoticeRequest;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
 import com.example.noticeservice.service.NoticeService;
 import java.util.List;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -31,7 +29,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,18 +48,19 @@ public class NoticeApiController {
         return ResponseEntity.ok(entityModels);
     }
 
+    // MissingServletRequestPartException: Required request part 'noticeImageRequest' is not present 이슈 발생
+    // @RequestPart -> @ModelAttribute 로 우회 해결
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createNotice(@ModelAttribute(value = "noticeImageRequest") NoticeImageRequest noticeImageRequest,
-        HttpSession session) throws Exception {
-//        if (bindingResult.hasErrors()) {
-//            return ResponseEntity.badRequest().body(bindingResult);
-//        }
-        System.out.println("noticeImageRequest = " + noticeImageRequest);
+    public ResponseEntity createNotice(@Valid @ModelAttribute NoticeImageRequest noticeImageRequest,
+        BindingResult bindingResult) throws Exception {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult);
+        }
 
         NoticeRequest noticeRequest = noticeImageRequest.toNoticeRequest();
         List<MultipartFile> files = noticeImageRequest.getFiles();
 
-        noticeService.create(noticeRequest, files, session);
+        noticeService.create(noticeRequest, files);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -76,15 +74,18 @@ public class NoticeApiController {
         return ResponseEntity.ok(model);
     }
 
-    @PatchMapping("/{noticeId}")
-    public ResponseEntity editNotice(@PathVariable Long noticeId, @Valid @RequestPart NoticeImageRequest noticeImageRequest,
-        BindingResult bindingResult) throws Exception {
+    // Edit 과정에 toNoticeRequest() 사용 시 LocalDateTime.parse() 에서 NPE 발생
+    // 수정에는 title, content 만 변경 가능하기 때문에 toEditNoticeRequest() 로 title, content 만 넘기도록 수정
+    @PatchMapping(value = "/{noticeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity editNotice(@PathVariable Long noticeId,
+        @Valid @RequestBody NoticeImageRequest noticeImageRequest, BindingResult bindingResult) throws Exception {
 
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult);
         }
 
-        NoticeRequest noticeRequest = noticeImageRequest.toNoticeRequest();
+        System.out.println("noticeImageRequest = " + noticeImageRequest);
+        NoticeRequest noticeRequest = noticeImageRequest.toEditNoticeRequest();
         List<MultipartFile> files = noticeImageRequest.getFiles();
 
         noticeService.edit(noticeId, noticeRequest, files);

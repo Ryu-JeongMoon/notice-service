@@ -31,8 +31,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    // 기본 생성 USER
     @Enumerated(value = EnumType.STRING)
-    private Role role;
+    private Role role = Role.ROLE_USER;
 
     @Builder
     public User(String username, String password) {
@@ -40,7 +41,11 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    public void changePassword(String password) {
+    public void setPasswordAs(String password) {
         this.password = password;
+    }
+
+    public void changeRole(Role role) {
+        this.role = role;
     }
 }

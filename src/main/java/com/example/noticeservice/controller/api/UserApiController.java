@@ -21,6 +21,7 @@ public class UserApiController {
 
     private final UserService userService;
 
+    // 중복 가입, 중복 로그인을 막기 위해 PreAuthorize 권한 체크
     @PostMapping
     @PreAuthorize("isAnonymous()")
     public ResponseEntity signup(@Valid @RequestBody UserRequest userRequest, BindingResult bindingResult) {

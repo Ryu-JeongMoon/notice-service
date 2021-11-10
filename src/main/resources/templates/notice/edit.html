@@ -7,47 +7,76 @@
 <body>
 <div>
     <h2>Edit</h2><br/><br/>
-    <div>
+    <div th:object="${noticeImageRequest}">
         <div>
             <label for="id">notice-id</label>
             <input id="id" th:placeholder="${notice.id}" disabled>
         </div>
         <div>
             <label for="title">title:</label>
-            <input id="title" th:placeholder="${notice.title}">
+            <input id="title" type="text" th:field="*{title}" th:placeholder="${notice.title}">
         </div>
         <div>
             <label for="content">content:</label>
-            <input id="content" th:placeholder="${notice.content}"/>
+            <input id="content" type="text" th:field="*{content}" th:placeholder="${notice.content}"/>
         </div>
         <div>
-            <label for="createdDateTime">createdDateTime</label>
+            <label for="createdDateTime">createdDateTime:</label>
             <input id="createdDateTime" th:placeholder="${notice.createdDateTime}" disabled/>
         </div>
         <div>
-            <label for="hit">hit</label>
+            <label for="hit">hit:</label>
             <input id="hit" th:placeholder="${notice.hit}" disabled/>
         </div>
         <div>
             <label for="username">username:</label>
             <input id="username" th:placeholder="${notice.username}" disabled/>
         </div>
-
+        <button onclick="editNotice()">Edit</button>
+        <button type="submit">Submit</button>
+        <button onclick="deleteNotice()">Delete</button>
+        <button onclick="getNotice()">Back</button>
     </div>
-    <button onclick="editNotice()">Edit</button>
-    <button onclick="deleteNotice()">Delete</button>
 </div>
 
 <hr>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    let noticeId = /*[[ ${notice.id} ]]*/;
+    const noticeId = /*[[ ${notice.id} ]]*/;
 
     /*]]*/
 
-    function editNotice() {
-        location.href = '/notices/edit/' + noticeId;
+    async function editNotice() {
+        const title = document.getElementById('title').value !== "" ? document.getElementById('title').value : null;
+        const content = document.getElementById('content').value !== "" ? document.getElementById('content').value : null;
+
+        try {
+            await fetch("/api/notices/" + noticeId, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: title,
+                    content: content
+                }),
+            }).then((response) => {
+                if (response.status === 200 && confirm('게시글이 수정되었습니다')) {
+                    location.href = "/notices";
+                } else {
+                    console.log(response);
+                    if (confirm('올바른 값을 입력했는지 확인해주세요')) {
+                        location.href = "/notices/edit/" + noticeId;
+                    }
+                }
+            });
+        } catch (error) {
+            console.log(error);
+            if (confirm('올바른 값을 입력했는지 확인해주세요')) {
+                location.href = "/notices/edit/" + noticeId;
+            }
+        }
     }
 
     async function deleteNotice() {
@@ -59,17 +88,19 @@
                         "Content-Type": "application/json",
                     },
                 }).then((response) => {
-                    if (response.status === 204) {
+                    if (response.status === 204 && confirm('게시글이 삭제되었습니다')) {
                         location.href = "/notices"
                     }
                 });
             } catch (error) {
-                console.log(error);
+                if (confirm('작성자 본인 외에는 삭제할 수 없습니다')) {
+                    location.href = "/notices";
+                }
             }
         }
     }
 
-    function getOne(noticeId) {
+    function getNotice() {
         location.href = '/notices/' + noticeId;
     }
 </script>

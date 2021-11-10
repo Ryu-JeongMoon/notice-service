@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 @Data
 @Builder
@@ -19,4 +20,8 @@ public class UserRequest {
     // 특수 문자도 포함하기 위해 공백 제외 모든 문자 허용
     @Pattern(regexp = "^[\\S]{4,8}$")
     private String password;
+
+    public UsernamePasswordAuthenticationToken toAuthenticationToken() {
+        return new UsernamePasswordAuthenticationToken(username, password);
+    }
 }

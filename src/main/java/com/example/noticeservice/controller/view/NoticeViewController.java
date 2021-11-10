@@ -1,7 +1,6 @@
 package com.example.noticeservice.controller.view;
 
 import com.example.noticeservice.domain.notice.entity.dto.request.NoticeImageRequest;
-import com.example.noticeservice.domain.notice.entity.dto.request.NoticeRequest;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
 import com.example.noticeservice.util.Messages;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -32,6 +30,7 @@ public class NoticeViewController {
     private final ObjectMapper objectMapper;
     private WebClient webClient = WebClient.create(Messages.DEFAULT_URL);
 
+    // JSON Object 뷰로 내리기 위한 하드코딩
     @GetMapping
     public String getListForm(@PageableDefault Pageable pageable, Model model) {
         LinkedHashMap result = webClient.get()
@@ -41,7 +40,6 @@ public class NoticeViewController {
             .bodyToMono(LinkedHashMap.class)
             .block();
 
-        // JSON Object 뷰로 내리기 위한 하드코딩
         LinkedHashMap _embeddedMap = objectMapper.convertValue(result.get("_embedded"), LinkedHashMap.class);
         ArrayList<LinkedHashMap> arrayList = objectMapper.convertValue(_embeddedMap.get("noticeResponseList"), ArrayList.class);
 
@@ -104,6 +102,7 @@ public class NoticeViewController {
             .build();
 
         model.addAttribute("notice", noticeResponse);
+        model.addAttribute("noticeImageRequest", new NoticeImageRequest());
         return "notice/edit";
     }
 }

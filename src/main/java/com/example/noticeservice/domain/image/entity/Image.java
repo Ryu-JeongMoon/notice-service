@@ -1,4 +1,4 @@
-package com.example.noticeservice.domain.file.entity;
+package com.example.noticeservice.domain.image.entity;
 
 import com.example.noticeservice.domain.notice.entity.Notice;
 import javax.persistence.Column;
@@ -42,6 +42,7 @@ public class Image {
         this.fileSize = fileSize;
     }
 
+    // 연관 관계 메서드
     public void setNotice(Notice notice) {
         this.notice = notice;
 

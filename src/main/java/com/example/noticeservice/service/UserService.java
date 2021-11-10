@@ -1,14 +1,15 @@
 package com.example.noticeservice.service;
 
-import com.example.noticeservice.domain.user.entity.Role;
 import com.example.noticeservice.domain.user.entity.User;
 import com.example.noticeservice.domain.user.entity.dto.request.UserRequest;
 import com.example.noticeservice.domain.user.mapper.UserRequestMapper;
 import com.example.noticeservice.domain.user.mapper.UserResponseMapper;
 import com.example.noticeservice.domain.user.repository.UserRepository;
-import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,32 +19,26 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final UserRequestMapper requestMapper;
     private final UserResponseMapper responseMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
+    // DB 에 인코딩된 비밀번호를 저장하기 위해 Service 계층에서 암호화
     @Transactional
     public void register(UserRequest userRequest) {
         User user = requestMapper.toEntity(userRequest);
 
         String plainPassword = user.getPassword();
         String encodedPassword = passwordEncoder.encode(plainPassword);
-        user.changePassword(encodedPassword);
-        user.setRole(Role.ROLE_USER);
+        user.setPasswordAs(encodedPassword);
 
         userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
     public void login(UserRequest userRequest) {
-        User user = userRepository.findByUsername(userRequest.getUsername())
-            .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다"));
-
-        String plainPassword = userRequest.getPassword();
-        String encodedPassword = user.getPassword();
-
-        if (!passwordEncoder.matches(plainPassword, encodedPassword)) {
-            throw new BadCredentialsException("비밀번호가 맞지 않습니다");
-        }
+        UsernamePasswordAuthenticationToken authenticationToken = userRequest.toAuthenticationToken();
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

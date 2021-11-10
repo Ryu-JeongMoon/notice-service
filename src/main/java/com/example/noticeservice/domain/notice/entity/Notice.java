@@ -1,9 +1,10 @@
 package com.example.noticeservice.domain.notice.entity;
 
-import com.example.noticeservice.domain.file.entity.Image;
+import com.example.noticeservice.domain.image.entity.Image;
 import com.example.noticeservice.domain.user.entity.User;
 import com.example.noticeservice.util.BaseEntity;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -72,11 +73,9 @@ public class Notice extends BaseEntity {
     }
 
     public void addImage(Image image) {
+        images = images != null ? images : new ArrayList<>();
         images.add(image);
-
-        if (image.getNotice() != this) {
-            image.setNotice(this);
-        }
+        image.setNotice(this);
     }
 
     public void changeStatus() {
