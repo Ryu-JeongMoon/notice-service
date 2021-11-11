@@ -31,8 +31,9 @@
             </tbody>
         </table>
     </div>
-    <button onclick="editNotice()">Edit</button>
-    <button onclick="deleteNotice()">Delete</button>
+    <button onclick="editNotice(event)">Edit</button>
+    <button onclick="deleteNotice(event)">Delete</button>
+    <button onclick="getNoticeList()">Back</button>
 </div>
 
 <hr>
@@ -42,11 +43,14 @@
     let noticeId = /*[[ ${notice.id} ]]*/;
     /*]]*/
 
-    function editNotice() {
+    function editNotice(event) {
+        event.preventDefault();
         location.href='/notices/edit/' + noticeId;
     }
 
-    async function deleteNotice() {
+    async function deleteNotice(event) {
+        event.preventDefault();
+
         if (confirm('정말 삭제하시겠습니까?')) {
             try {
                 await fetch("/api/notices/" + noticeId, {
@@ -65,8 +69,8 @@
         }
     }
 
-    function getOne(noticeId) {
-        location.href = '/notices/' + noticeId;
+    function getNoticeList() {
+        location.href = '/notices';
     }
 </script>
 </body>

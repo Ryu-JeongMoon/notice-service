@@ -7,6 +7,7 @@ import com.example.noticeservice.domain.notice.entity.dto.request.NoticeImageReq
 import com.example.noticeservice.domain.notice.entity.dto.request.NoticeRequest;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
 import com.example.noticeservice.service.NoticeService;
+import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,9 +51,9 @@ public class NoticeApiController {
         return ResponseEntity.ok(entityModels);
     }
 
-    // MissingServletRequestPartException: Required request part 'noticeImageRequest' is not present 이슈 발생
-    // @RequestPart -> @ModelAttribute 로 우회 해결
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    // 첨부파일 없어도 게시글은 등록되도록 files null check 후, null 일 땐 빈 리스트 넘기도록
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity createNotice(@Valid @ModelAttribute NoticeImageRequest noticeImageRequest,
         BindingResult bindingResult) throws Exception {
         if (bindingResult.hasErrors()) {
@@ -59,6 +62,7 @@ public class NoticeApiController {
 
         NoticeRequest noticeRequest = noticeImageRequest.toNoticeRequest();
         List<MultipartFile> files = noticeImageRequest.getFiles();
+        files = files != null ? files : Collections.emptyList();
 
         noticeService.create(noticeRequest, files);
         return ResponseEntity.status(HttpStatus.CREATED).build();

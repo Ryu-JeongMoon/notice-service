@@ -1,0 +1,35 @@
+spring:
+  cache:
+    type: redis
+
+  jpa:
+    generate-ddl: true
+    properties:
+      hibernate:
+        ddl-auto: create
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        show_sql: true
+
+  redis:
+    port: 6379
+    host: localhost
+
+  servlet:
+    multipart:
+      file-size-threshold: 1
+      max-file-size: 10
+      max-request-size: 30
+      enabled: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+
+  config: classpath:log4j2.xml
+  charset:
+    console: utf-8

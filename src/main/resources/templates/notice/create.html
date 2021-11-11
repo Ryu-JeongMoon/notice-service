@@ -7,7 +7,8 @@
 <body>
 <div>
     <h2>Create</h2><br/><br/>
-    <form th:action="@{/api/notices}" th:object="${noticeImageRequest}" enctype="multipart/form-data" method="post" novalidate>
+    <form id="uploadForm" name="uploadForm" th:action="@{/api/notices}" th:object="${noticeImageRequest}"
+          enctype="multipart/form-data" method="post" novalidate>
         <div class="form-group">
             <p>title: <input type="text" th:field="*{title}"></p>
         </div>
@@ -24,7 +25,7 @@
             <p>files: <input type="file" multiple="multiple" th:field="*{files}"></p>
         </div>
         <div class="form-group">
-            <button type="button" onclick="create()">Create</button>
+            <button type="button" onclick="create(event)">Create</button>
             <button type="submit">Submit</button>
         </div>
     </form>
@@ -33,27 +34,18 @@
 <hr>
 
 <script>
-    async function create() {
-        const title = document.getElementById("title").value;
-        const content = document.getElementById("content").value;
-        const startDateTime = document.getElementById("startDateTime").value;
-        const endDateTime = document.getElementById("endDateTime").value;
-        const files = document.getElementById("files").value;
+    async function create(event) {
+        event.preventDefault();
+
+        const form = document.uploadForm;
+        // const form = document.getElementsByName("uploadForm").values();
+        const data = new FormData(form);
 
         try {
             await fetch("/api/notices", {
                 method: "POST",
-                enctype: 'multipart/form-data',
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-                body: JSON.stringify({
-                    title: title,
-                    content: content,
-                    startDateTime: startDateTime,
-                    endDateTime: endDateTime,
-                    files: files
-                }),
+                body: data,
+                headers: {},
             }).then((response) => {
                 if (response.status === 200) {
                     location.href = "/notices"

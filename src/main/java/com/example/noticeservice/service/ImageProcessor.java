@@ -21,15 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageProcessor {
 
     private static final String ABSOLUTE_PATH = new File("").getAbsolutePath() + File.separator + File.separator;
-    private final ImageService imageService;
 
+    // 파일첨부하지 않고 multipart/form-data 넘기면 "" 으로 들어와 빈 리스트로 들어오지 않는다
     public List<Image> parse(List<MultipartFile> files) throws Exception {
         List<Image> imageList = new ArrayList<>();
-
-        if (CollectionUtils.isEmpty(files)) {
-            log.warn("FAILED :: There is no files");
-            return Collections.emptyList();
-        }
 
         String currentDateString = getCurrentDateString();
         String path = "images" + File.separator + currentDateString;
@@ -38,10 +33,15 @@ public class ImageProcessor {
         checkFileExistence(file);
 
         for (MultipartFile multipartFile : files) {
-            String currentDateTimeString = getCurrentDateTimeString();
-
-            String contentType = multipartFile.getContentType();
             String originalFilename = multipartFile.getOriginalFilename();
+
+            if (originalFilename.equals("")) {
+                log.warn("FAILED :: There is no files");
+                continue;
+            }
+
+            String currentDateTimeString = getCurrentDateTimeString();
+            String contentType = multipartFile.getContentType();
             String originalFileNameWithoutExtension = originalFilename.substring(0, originalFilename.indexOf("."));
 
             checkFileExtension(multipartFile, contentType);

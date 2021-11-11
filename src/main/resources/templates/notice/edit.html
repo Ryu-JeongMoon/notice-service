@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Edit Page</title>
@@ -32,10 +32,10 @@
             <label for="username">username:</label>
             <input id="username" th:placeholder="${notice.username}" disabled/>
         </div>
-        <button onclick="editNotice()">Edit</button>
+        <button onclick="editNotice(event)">Edit</button>
         <button type="submit">Submit</button>
-        <button onclick="deleteNotice()">Delete</button>
-        <button onclick="getNotice()">Back</button>
+        <button onclick="deleteNotice(event)">Delete</button>
+        <button onclick="getNotice(event)">Back</button>
     </div>
 </div>
 
@@ -47,7 +47,8 @@
 
     /*]]*/
 
-    async function editNotice() {
+    async function editNotice(event) {
+        event.preventDefault();
         const title = document.getElementById('title').value !== "" ? document.getElementById('title').value : null;
         const content = document.getElementById('content').value !== "" ? document.getElementById('content').value : null;
 
@@ -79,7 +80,8 @@
         }
     }
 
-    async function deleteNotice() {
+    async function deleteNotice(event) {
+        event.preventDefault();
         if (confirm('정말 삭제하시겠습니까?')) {
             try {
                 await fetch("/api/notices/" + noticeId, {
@@ -100,7 +102,8 @@
         }
     }
 
-    function getNotice() {
+    function getNotice(event) {
+        event.preventDefault();
         location.href = '/notices/' + noticeId;
     }
 </script>

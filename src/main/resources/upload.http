@@ -1,0 +1,14 @@
+###
+POST localhost:8080/api/notices
+Content-Type: multipart/form-data
+
+--WebAppBoundary
+Content-Disposition: form-data; name="meta-data"
+Content-Type: application/json; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+{
+    "title": "panda",
+    "content": "bear"
+}
+--WebAppBoundary--

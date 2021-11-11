@@ -55,11 +55,10 @@ public class NoticeService {
             .orElseThrow(() -> new EntityNotFoundException(Messages.BOARD_NOT_FOUND));
     }
 
-    // files 존재하지 않더라도 게시글 등록 가능하도록 parse() 에서 Empty List 반환
+    // create 과정에 작성자 입력 없이 추가할 수 있도록 SecurityContextHolder 이용
     @Transactional
     public void create(NoticeRequest noticeRequest, List<MultipartFile> files) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("username = " + username);
 
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException(Messages.USER_NOT_FOUND));
@@ -68,7 +67,6 @@ public class NoticeService {
         notice.setUser(user);
 
         List<Image> images = imageProcessor.parse(files);
-
         images.stream()
             .filter(Objects::nonNull)
             .map(imageRepository::save)
