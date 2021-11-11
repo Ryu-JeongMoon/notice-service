@@ -8,6 +8,5 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long>, CustomNoticeRepository {
 
-    @Query("select n from Notice n join fetch n.images where n.id = :id and n.status = :status")
     Optional<Notice> findByIdAndStatus(Long id, Status status);
 }

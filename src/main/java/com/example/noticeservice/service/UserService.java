@@ -2,9 +2,12 @@ package com.example.noticeservice.service;
 
 import com.example.noticeservice.domain.user.entity.User;
 import com.example.noticeservice.domain.user.entity.dto.request.UserRequest;
+import com.example.noticeservice.domain.user.entity.dto.response.UserResponse;
 import com.example.noticeservice.domain.user.mapper.UserRequestMapper;
 import com.example.noticeservice.domain.user.mapper.UserResponseMapper;
 import com.example.noticeservice.domain.user.repository.UserRepository;
+import com.example.noticeservice.util.Messages;
+import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -23,6 +26,13 @@ public class UserService {
     private final UserRequestMapper requestMapper;
     private final UserResponseMapper responseMapper;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+
+    @Transactional(readOnly = true)
+    public UserResponse findByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .map(responseMapper::toDto)
+            .orElseThrow(() -> new EntityNotFoundException(Messages.USER_NOT_FOUND));
+    }
 
     // DB 에 인코딩된 비밀번호를 저장하기 위해 Service 계층에서 암호화
     @Transactional

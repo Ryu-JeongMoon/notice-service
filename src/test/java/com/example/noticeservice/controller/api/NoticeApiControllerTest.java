@@ -2,8 +2,8 @@ package com.example.noticeservice.controller.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,9 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
 
 // Notice Create 과정에 실제 USER 권한이 필요하기 때문에 @WithMockUser 로도 해결할 수 없고
 // @WebMvcTest 진행할 수 없어 TEST 수행 전 실제 USER 정보를 넣기 위해 @SpringBootTest 로 진행
@@ -57,6 +59,9 @@ class NoticeApiControllerTest {
 
     @BeforeEach
     void init() {
+        userRepository.deleteAll();
+        noticeRepository.deleteAll();
+
         User user = User.builder()
             .username("PANDA")
             .password("123456")
@@ -101,18 +106,24 @@ class NoticeApiControllerTest {
             .files(Collections.emptyList())
             .build();
 
-        System.out.println("noticeImageRequest = " + noticeImageRequest);
+        byte[] jsonBytes = objectMapper.writeValueAsString(noticeImageRequest).getBytes();
+
+        LinkedMultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.add("title", TITLE);
+        multiValueMap.add("content", CONTENT);
+        multiValueMap.add("startDateTime", startDateTime);
+        multiValueMap.add("endDateTime", endDateTime);
 
         mockMvc.perform(
-                post("/api/notices")
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .content(objectMapper.writeValueAsString(noticeImageRequest)))
+                multipart("/api/notices")
+                    .file(new MockMultipartFile("file", jsonBytes))
+                    .params(multiValueMap))
             .andDo(print())
             .andExpect(status().isCreated());
     }
 
     @Test
-    @DisplayName("게시글 단건 조회")
+    @DisplayName("게시글 단건 조회 성공 - 200")
     void getNotice() throws Exception {
         mockMvc.perform(
                 get("/api/notices/" + NOTICE_ID).accept(MediaType.ALL))
@@ -127,7 +138,7 @@ class NoticeApiControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 수정")
+    @DisplayName("게시글 수정 성공 - 200")
     void editNotice() throws Exception {
         NoticeRequest noticeRequest = NoticeRequest.builder()
             .title("NEW-TITLE")
@@ -143,11 +154,12 @@ class NoticeApiControllerTest {
     }
 
     @Test
+    @DisplayName("게시글 단건 삭제 성공 - 204")
     void deleteNotice() throws Exception {
         mockMvc.perform(
-                delete("/api/notices/" + NOTICE_ID).accept(MediaType.ALL))
+                delete("/api/notices/" + NOTICE_ID)
+                    .accept(MediaType.ALL))
             .andDo(print())
             .andExpect(status().isNoContent());
-
     }
 }

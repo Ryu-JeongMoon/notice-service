@@ -79,7 +79,7 @@ public class NoticeApiController {
     }
 
     // Edit 과정에 toNoticeRequest() 사용 시 LocalDateTime.parse() 에서 NPE 발생
-    // 수정에는 title, content 만 변경 가능하기 때문에 toEditNoticeRequest() 로 title, content 만 넘기도록 수정
+    // TODO, Edit 로직 수정 필요
     @PatchMapping(value = "/{noticeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity editNotice(@PathVariable Long noticeId,
         @Valid @RequestBody NoticeImageRequest noticeImageRequest, BindingResult bindingResult) throws Exception {
@@ -99,6 +99,7 @@ public class NoticeApiController {
         return ResponseEntity.ok().body(link);
     }
 
+    // soft-delete 를 위해 Entity 에서 상태 변경
     @DeleteMapping("/{noticeId}")
     public ResponseEntity deleteNotice(@PathVariable Long noticeId) {
         noticeService.delete(noticeId);

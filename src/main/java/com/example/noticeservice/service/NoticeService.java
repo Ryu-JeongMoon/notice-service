@@ -52,7 +52,7 @@ public class NoticeService {
                 return notice;
             })
             .map(responseMapper::toDto)
-            .orElseThrow(() -> new EntityNotFoundException(Messages.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new EntityNotFoundException(Messages.NOTICE_NOT_FOUND));
     }
 
     // create 과정에 작성자 입력 없이 추가할 수 있도록 SecurityContextHolder 이용
@@ -67,18 +67,20 @@ public class NoticeService {
         notice.setUser(user);
 
         List<Image> images = imageProcessor.parse(files);
-        images.stream()
-            .filter(Objects::nonNull)
-            .map(imageRepository::save)
-            .forEach(notice::addImage);
+        notice.addImages(images);
 
         noticeRepository.save(notice);
     }
 
+    // 활성 상태의 게시글만 수정 가능하도록 findById -> findByIdAndStatus 변경
+    // images 갖고 있지 않는 notice 의 경우 join fetch 시 No value present 에러 발생, edit 과정에서 조건 분기에 따라 해결하거나 첨부파일을 필수로 받아야 할듯
+    // -> 연관관계의 주인이 아닌 곳, 즉 외래키를 가지고 있지 않은 곳에서 호출하면 항상 EAGER 로 작동, 참조하고 있는 값이 null 인지 아닌지 확인이 불가하기 때문
     @Transactional
     public void edit(Long id, NoticeRequest noticeRequest, List<MultipartFile> files) throws Exception {
-        Notice notice = noticeRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException(Messages.BOARD_NOT_FOUND));
+        Notice notice = noticeRepository.findByIdAndStatus(id, Status.ACTIVE)
+            .orElseThrow(() -> new EntityNotFoundException(Messages.NOTICE_NOT_FOUND));
+
+        List<Image> originalImages = notice.getImages();
 
         List<Image> images = imageProcessor.parse(files);
         images.stream()
@@ -92,7 +94,7 @@ public class NoticeService {
     @Transactional
     public void delete(Long id) {
         Notice notice = noticeRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException(Messages.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new EntityNotFoundException(Messages.NOTICE_NOT_FOUND));
 
         notice.changeStatus();
     }

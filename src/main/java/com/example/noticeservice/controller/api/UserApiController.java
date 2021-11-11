@@ -26,7 +26,7 @@ public class UserApiController {
     @PreAuthorize("isAnonymous()")
     public ResponseEntity signup(@Valid @RequestBody UserRequest userRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult);
+            return ResponseEntity.badRequest().body(bindingResult.getFieldErrors());
         }
 
         userService.register(userRequest);
@@ -37,7 +37,7 @@ public class UserApiController {
     @PreAuthorize("isAnonymous()")
     public ResponseEntity login(@Valid @RequestBody UserRequest userRequest, BindingResult bindingResult, HttpSession session) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult);
+            return ResponseEntity.badRequest().body(bindingResult.getFieldErrors());
         }
 
         userService.login(userRequest);

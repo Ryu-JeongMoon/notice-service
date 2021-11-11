@@ -13,6 +13,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -31,7 +32,7 @@ import lombok.Setter;
 public class Notice extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "notice_id")
     private Long id;
 
@@ -55,8 +56,8 @@ public class Notice extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Image> images;
+    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
+    private List<Image> images = new ArrayList<>();
 
     private int hit;
 
@@ -73,9 +74,13 @@ public class Notice extends BaseEntity {
     }
 
     public void addImage(Image image) {
-        images = images != null ? images : new ArrayList<>();
         images.add(image);
         image.setNotice(this);
+    }
+
+    public void addImages(List<Image> images) {
+        this.images.addAll(images);
+        images.forEach(i -> i.setNotice(this));
     }
 
     public void changeStatus() {
