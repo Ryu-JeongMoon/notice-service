@@ -84,8 +84,8 @@
                         <td>
                             <img class="img-responsive" th:src="|/images${imageResponse.filePath}/${imageResponse.fileName}|"
                                  alt="">
-                            <button type="button" class="btn btn-danger"
-                                    th:onclick="'javascript:deleteImage(' + ${imageResponse.id} + ');'">Delete this image
+                            <button type="button" class="btn btn-danger" th:text="Delete this image"
+                                    th:onclick="'javascript:deleteImage(' + ${imageResponse.id} + ');'">
                             </button>
                         </td>
                     </tr>

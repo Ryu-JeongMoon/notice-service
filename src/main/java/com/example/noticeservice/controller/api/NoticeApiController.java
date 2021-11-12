@@ -45,7 +45,7 @@ public class NoticeApiController {
     private final PagedResourcesAssembler<NoticeResponse> assembler;
 
     @GetMapping
-    public ResponseEntity getNoticeList(@PageableDefault(sort = "id", direction = Direction.DESC) Pageable pageable) {
+    public ResponseEntity getNoticeList(Pageable pageable) {
         Page<NoticeResponse> notices = noticeService.getNotices(pageable);
         PagedModel<EntityModel<NoticeResponse>> entityModels = assembler.toModel(notices);
         return ResponseEntity.ok(entityModels);

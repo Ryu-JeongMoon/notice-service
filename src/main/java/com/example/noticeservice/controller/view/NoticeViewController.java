@@ -1,14 +1,13 @@
 package com.example.noticeservice.controller.view;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import com.example.noticeservice.domain.image.entity.dto.response.ImageResponse;
 import com.example.noticeservice.domain.notice.entity.dto.request.NoticeImageRequest;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
 import com.example.noticeservice.domain.user.entity.dto.response.UserResponse;
+import com.example.noticeservice.util.CustomPage;
 import com.example.noticeservice.util.Messages;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import javassist.tools.web.BadHttpRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.minidev.json.JSONObject;
@@ -51,7 +49,9 @@ public class NoticeViewController {
     @GetMapping
     public String getListForm(@PageableDefault Pageable pageable, Model model) {
         LinkedHashMap result = webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/api/notices").queryParam("pageable", pageable).build())
+            .uri(uriBuilder -> uriBuilder.path("/api/notices")
+                .queryParam("page", pageable.getPageNumber())
+                .queryParam("size", pageable.getPageSize()).build())
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono(LinkedHashMap.class)
@@ -73,6 +73,17 @@ public class NoticeViewController {
                 .build())
             .collect(Collectors.toList());
 
+        LinkedHashMap<String, Integer> pageMap = objectMapper.convertValue(result.get("page"), new TypeReference<>() {
+        });
+
+        CustomPage page = CustomPage.builder()
+            .size(pageMap.get("size"))
+            .number(pageMap.get("number"))
+            .totalPages(pageMap.get("totalPages"))
+            .totalElements(pageMap.get("totalElements"))
+            .build();
+
+        model.addAttribute("page", page);
         model.addAttribute("noticeResponses", noticeResponses);
         return "notice/get-notice-list";
     }

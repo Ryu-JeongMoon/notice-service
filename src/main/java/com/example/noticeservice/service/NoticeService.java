@@ -51,11 +51,7 @@ public class NoticeService {
 
     @Transactional(readOnly = true)
     public Page<NoticeResponse> getNotices(Pageable pageable) {
-        List<NoticeResponse> collect = noticeRepository.findByStatus(pageable, Status.ACTIVE)
-            .stream()
-            .map(responseMapper::toDto)
-            .collect(Collectors.toList());
-        return new PageImpl<>(collect);
+        return noticeRepository.findByStatus(pageable, Status.ACTIVE);
     }
 
     // 조회수 증가를 위해 Query + Command 형태

@@ -36,6 +36,10 @@
             </tr>
             </tbody>
         </table>
+        <span th:each="index : ${#numbers.sequence(1, page.totalPages)}">
+            <button type="button" class="btn btn-primary" th:onclick="'javascript:movePage(' + ${index} +');'"
+                    th:text="${index}"></button>
+        </span>
     </div>
 </div>
 
@@ -44,6 +48,14 @@
 <script>
     function getOne(noticeId) {
         location.href = '/notices/' + noticeId;
+    }
+
+    async function movePage(index) {
+        await fetch('/notices?size=10&page=' + (index-1), {
+            method: "GET"
+        }).then((response) => {
+            console.log(response);
+        });
     }
 </script>
 </body>
