@@ -1,5 +1,6 @@
 package com.example.noticeservice.domain.notice.entity.dto.response;
 
+import com.example.noticeservice.domain.user.entity.dto.response.UserResponse;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,5 +23,5 @@ public class NoticeResponse {
 
     private int hit;
 
-    private String username;
+    private UserResponse userResponse;
 }

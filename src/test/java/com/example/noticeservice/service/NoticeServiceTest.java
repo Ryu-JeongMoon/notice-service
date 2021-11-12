@@ -1,8 +1,7 @@
 package com.example.noticeservice.service;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.noticeservice.NoticeServiceApplication;
 import com.example.noticeservice.domain.notice.entity.Notice;
 import com.example.noticeservice.domain.notice.entity.dto.request.NoticeRequest;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
@@ -13,19 +12,14 @@ import com.example.noticeservice.domain.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import javax.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -35,6 +29,9 @@ class NoticeServiceTest {
     private static Long NOTICE_ID;
     private final String TITLE = "panda";
     private final String CONTENT = "bear";
+    private final String USERNAME = "panda";
+    private final String PASSWORD = "bear";
+
     private final PageRequest pageRequest = PageRequest.of(0, 10);
 
     @Autowired
@@ -45,12 +42,20 @@ class NoticeServiceTest {
     UserRepository userRepository;
     @Autowired
     NoticeRepository noticeRepository;
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @BeforeEach
     void init() throws Exception {
+        User user = User.builder()
+            .username(USERNAME)
+            .password(passwordEncoder.encode(PASSWORD))
+            .build();
+        userRepository.save(user);
+
         Notice notice = Notice.builder()
             .title(TITLE)
             .content(CONTENT)
+            .user(user)
             .startDateTime(LocalDateTime.now())
             .endDateTime(LocalDateTime.of(2022, 12, 31, 3, 2, 4))
             .build();

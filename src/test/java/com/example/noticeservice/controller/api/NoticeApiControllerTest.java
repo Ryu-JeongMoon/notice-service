@@ -66,13 +66,13 @@ class NoticeApiControllerTest {
             .username("PANDA")
             .password("123456")
             .build();
-
         userRepository.save(user);
 
         Notice notice = Notice.builder()
             .title(TITLE)
             .content(CONTENT)
             .startDateTime(LocalDateTime.now())
+            .user(user)
             .endDateTime(LocalDateTime.of(2022, 12, 31, 0, 0, 0))
             .build();
         NOTICE_ID = noticeRepository.save(notice).getId();
@@ -132,8 +132,7 @@ class NoticeApiControllerTest {
             .andExpect(jsonPath("id").exists())
             .andExpect(jsonPath("content").exists())
             .andExpect(jsonPath("createdDateTime").exists())
-            .andExpect(jsonPath("username").exists())
-            .andExpect(jsonPath("files").exists())
+            .andExpect(jsonPath("userResponse").exists())
             .andExpect(jsonPath("_links").exists());
     }
 

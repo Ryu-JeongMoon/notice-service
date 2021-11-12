@@ -51,20 +51,20 @@ public class ImageProcessor {
                 continue;
             }
 
-            String currentDateTimeString = getCurrentDateTimeString();
+            String currentTimeString = getCurrentTimeString();
             String contentType = multipartFile.getContentType();
-            String originalFileNameWithoutExtension = originalFilename.substring(0, originalFilename.indexOf("."));
+            String fileNameWithoutExtension = originalFilename.substring(0, originalFilename.indexOf("."));
 
             checkFileExtension(multipartFile, contentType);
 
-            String originalFileExtension = getOriginalFileExtension(contentType);
-            String fileName = currentDateTimeString + originalFileNameWithoutExtension + originalFileExtension;
+            String convertedFileExtension = getFileExtension(contentType);
+            String fileName = currentTimeString + fileNameWithoutExtension + convertedFileExtension;
 
             // image 저장 경로 중복을 피하기 위해 절대 경로를 넣지 않고 DB 저장, 이미지 사용 시에 절대 경로 주입 받아 붙여줘야 함
             Image image = Image.builder()
                 .originalFileName(originalFilename)
                 .fileName(fileName)
-                .filePath(File.separator + currentDateTimeString)
+                .filePath(File.separator + currentDateString)
                 .fileSize(multipartFile.getSize())
                 .build();
 
@@ -96,7 +96,7 @@ public class ImageProcessor {
         }
     }
 
-    private String getOriginalFileExtension(String contentType) {
+    private String getFileExtension(String contentType) {
         if (contentType.contains("image/jpeg")) {
             return ".jpg";
         } else if (contentType.contains("image/png")) {
@@ -114,8 +114,7 @@ public class ImageProcessor {
     }
 
     // 이미지 이름 중복 방지를 위해 이미지 저장 날짜 + 시간에 해당하는 이미지 이름 문자열
-    private String getCurrentDateTimeString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-hhmmss");
-        return LocalDateTime.now().format(formatter);
+    private String getCurrentTimeString() {
+        return String.valueOf(System.nanoTime());
     }
 }

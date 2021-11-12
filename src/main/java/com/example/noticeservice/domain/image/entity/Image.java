@@ -29,13 +29,10 @@ public class Image {
     @JoinColumn(name = "notice_id")
     private Notice notice;
 
-    @Column(nullable = false)
     private String originalFileName;
 
-    @Column(nullable = false)
     private String fileName;
 
-    @Column(nullable = false)
     private String filePath;
 
     private Long fileSize;

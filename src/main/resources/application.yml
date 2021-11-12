@@ -2,6 +2,9 @@ spring:
   profiles:
     include: file
 
+  resources:
+    static-locations: classpath:/static/
+
   datasource:
     hikari:
       jdbc-url: jdbc:h2:tcp://localhost/~/notice-service

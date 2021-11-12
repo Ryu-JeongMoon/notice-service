@@ -11,7 +11,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,11 +61,12 @@ public class Notice extends BaseEntity {
     private int hit;
 
     @Builder
-    public Notice(String title, String content, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Notice(String title, String content, LocalDateTime startDateTime, LocalDateTime endDateTime, User user) {
         this.title = title;
         this.content = content;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
+        this.user = user;
 
         if (startDateTime.isAfter(endDateTime)) {
             throw new IllegalArgumentException("공지 시작일시는 종료일시보다 늦을 수 없습니다");

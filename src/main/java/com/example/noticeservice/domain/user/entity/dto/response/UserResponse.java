@@ -14,4 +14,8 @@ public class UserResponse {
 
     @Pattern(regexp = "^[\\w]{4,8}$")
     private String username;
+
+    public static UserResponse from(String username) {
+        return new UserResponse(username);
+    }
 }

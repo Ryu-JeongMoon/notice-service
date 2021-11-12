@@ -51,8 +51,8 @@ class UserApiControllerTest {
     @WithAnonymousUser
     void signup() throws Exception {
         UserRequest userRequest = UserRequest.builder()
-            .username(USERNAME)
-            .password(PASSWORD)
+            .username(USERNAME + 1)
+            .password(PASSWORD + 1)
             .build();
 
         mockMvc.perform(

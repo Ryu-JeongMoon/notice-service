@@ -1,56 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Get One</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 </head>
 <body>
-<div>
+<div class="container-fluid">
     <h2>Get One</h2><br/><br/>
-    <div>
-        <table>
-            <thead>
-            <tr>
-                <th>sequence.</th>
-                <th>title.</th>
-                <th>content</th>
-                <th>createdDateTime</th>
-                <th>hit</th>
-                <th>username</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td id="id" th:text="${notice.id}"></td>
-                <td id="title" th:text="${notice.title}"></td>
-                <td id="content" th:text="${notice.content}"></td>
-                <td id="createdDateTime" th:text="${notice.createdDateTime}"></td>
-                <td id="hit" th:text="${notice.hit}"></td>
-                <td id="username" th:text="${notice.username}"></td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>sequence.</th>
+                    <th>title.</th>
+                    <th>content</th>
+                    <th>createdDateTime</th>
+                    <th>hit</th>
+                    <th>username</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="id" th:text="${noticeResponse.id}"></td>
+                    <td id="title" th:text="${noticeResponse.title}"></td>
+                    <td id="content" th:text="${noticeResponse.content}"></td>
+                    <td id="createdDateTime" th:text="${noticeResponse.createdDateTime}"></td>
+                    <td id="hit" th:text="${noticeResponse.hit}"></td>
+                    <td id="username" th:text="${noticeResponse.username}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>Images.</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="imageResponse : ${imageResponses}">
+                    <td><img class="img-responsive" th:src="|/images${imageResponse.filePath}/${imageResponse.fileName}|" alt="">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <button onclick="editNotice(event)">Edit</button>
-    <button onclick="deleteNotice(event)">Delete</button>
-    <button onclick="getNoticeList()">Back</button>
+    <button class="btn btn-primary" type="button" onclick="editNotice(event)">Edit</button>
+    <button class="btn btn-danger" type="button" onclick="deleteNotice(event)">Delete</button>
+    <button class="btn btn-info" type="button" onclick="getNoticeList()">Back</button>
 </div>
 
 <hr>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    let noticeId = /*[[ ${notice.id} ]]*/;
+    let noticeId = /*[[ ${noticeResponse.id} ]]*/;
+
     /*]]*/
 
     function editNotice(event) {
         event.preventDefault();
-        location.href='/notices/edit/' + noticeId;
+        location.href = '/notices/edit/' + noticeId;
     }
 
     async function deleteNotice(event) {
         event.preventDefault();
-
         if (confirm('정말 삭제하시겠습니까?')) {
             try {
                 await fetch("/api/notices/" + noticeId, {
@@ -59,12 +77,14 @@
                         "Content-Type": "application/json",
                     },
                 }).then((response) => {
-                    if (response.status === 204) {
+                    if (response.status === 204 && confirm('게시글이 삭제되었습니다')) {
                         location.href = "/notices"
                     }
                 });
             } catch (error) {
-                console.log(error);
+                if (confirm('작성자 본인 외에는 삭제할 수 없습니다')) {
+                    location.href = "/notices";
+                }
             }
         }
     }
@@ -74,6 +94,19 @@
     }
 </script>
 </body>
+<style>
+    img {
+        width: 300px;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    @-moz-document url-prefix() {
+        fieldset {
+            display: table-cell;
+        }
+    }
+</style>
 </html>
 
 

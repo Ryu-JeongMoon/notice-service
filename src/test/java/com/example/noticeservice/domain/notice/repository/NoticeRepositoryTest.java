@@ -7,6 +7,8 @@ import com.example.noticeservice.domain.image.entity.Image;
 import com.example.noticeservice.domain.image.repository.ImageRepository;
 import com.example.noticeservice.domain.notice.entity.Notice;
 import com.example.noticeservice.domain.notice.entity.Status;
+import com.example.noticeservice.domain.user.entity.User;
+import com.example.noticeservice.domain.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @DataJpaTest
 @Import(JpaConfigTest.class)
@@ -26,15 +30,25 @@ class NoticeRepositoryTest {
     private final String CONTENT = "content";
 
     @Autowired
-    NoticeRepository noticeRepository;
+    UserRepository userRepository;
     @Autowired
     ImageRepository imageRepository;
+    @Autowired
+    NoticeRepository noticeRepository;
 
     @BeforeEach
     void init() {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User user = User.builder()
+            .username("user")
+            .password(passwordEncoder.encode("password"))
+            .build();
+        userRepository.save(user);
+
         Notice n1 = Notice.builder()
             .title(TITLE)
             .content(CONTENT)
+            .user(user)
             .startDateTime(LocalDateTime.now())
             .endDateTime(LocalDateTime.of(2044, 11, 4, 3, 1, 2))
             .build();
@@ -43,6 +57,7 @@ class NoticeRepositoryTest {
         Notice n2 = Notice.builder()
             .title(TITLE)
             .content(CONTENT)
+            .user(user)
             .startDateTime(LocalDateTime.now())
             .endDateTime(LocalDateTime.of(2044, 11, 4, 3, 1, 2))
             .build();

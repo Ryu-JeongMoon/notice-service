@@ -5,7 +5,9 @@ import com.example.noticeservice.domain.image.repository.ImageRepository;
 import com.example.noticeservice.domain.notice.entity.Notice;
 import com.example.noticeservice.domain.notice.entity.Status;
 import com.example.noticeservice.domain.notice.entity.dto.request.NoticeRequest;
+import com.example.noticeservice.domain.notice.entity.dto.response.NoticeImageResponse;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
+import com.example.noticeservice.domain.notice.mapper.NoticeImageResponseMapper;
 import com.example.noticeservice.domain.notice.mapper.NoticeRequestMapper;
 import com.example.noticeservice.domain.notice.mapper.NoticeResponseMapper;
 import com.example.noticeservice.domain.notice.repository.NoticeRepository;
@@ -29,6 +31,7 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final NoticeRequestMapper requestMapper;
     private final NoticeResponseMapper responseMapper;
+    private final NoticeImageResponseMapper imageResponseMapper;
     private final ImageProcessor imageProcessor;
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;

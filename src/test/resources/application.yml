@@ -1,7 +1,8 @@
 spring:
   profiles:
     active: test
-    
+    include: file
+
   cache:
     type: redis
 
