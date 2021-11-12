@@ -35,7 +35,7 @@ class NoticeTest {
     }
 
     @Test
-    @DisplayName("시작일시는 종료일시보다 늦을 수 없다")
+    @DisplayName("시작일시는 종료일시보다 늦을 시 IllegalArgumentException 발생")
     void dateTest() {
         assertThrows(IllegalArgumentException.class, () -> Notice.builder()
                 .startDateTime(LocalDateTime.of(2021, 11, 30, 0, 0, 1))

@@ -33,13 +33,17 @@ public class Image {
     private String originalFileName;
 
     @Column(nullable = false)
+    private String fileName;
+
+    @Column(nullable = false)
     private String filePath;
 
     private Long fileSize;
 
     @Builder
-    public Image(String originalFileName, String filePath, Long fileSize) {
+    public Image(String originalFileName, String fileName, String filePath, Long fileSize) {
         this.originalFileName = originalFileName;
+        this.fileName = fileName;
         this.filePath = filePath;
         this.fileSize = fileSize;
     }
@@ -53,3 +57,5 @@ public class Image {
         }
     }
 }
+
+// TODO originalFileName 을 넣어줘야 하는 것인가?! fileName 만 있어도 충분할 것 같은데

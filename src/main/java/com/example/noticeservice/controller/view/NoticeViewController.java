@@ -1,5 +1,6 @@
 package com.example.noticeservice.controller.view;
 
+import com.example.noticeservice.domain.image.entity.Image;
 import com.example.noticeservice.domain.notice.entity.dto.request.NoticeImageRequest;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
 import com.example.noticeservice.util.Messages;

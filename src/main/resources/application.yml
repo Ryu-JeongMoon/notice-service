@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    include: file
+
   datasource:
     hikari:
       jdbc-url: jdbc:h2:tcp://localhost/~/notice-service
