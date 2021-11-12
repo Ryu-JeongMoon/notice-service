@@ -19,6 +19,7 @@ public class NoticeServiceApplication {
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
             .registerModules(new JavaTimeModule(), new Jdk8Module());
     }
 }

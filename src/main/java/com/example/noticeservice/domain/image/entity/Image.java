@@ -55,4 +55,5 @@ public class Image {
     }
 }
 
-// TODO originalFileName 을 넣어줘야 하는 것인가?! fileName 만 있어도 충분할 것 같은데
+// originalFileName 을 넣어줘야 하는 것인가?! fileName 만 있어도 충분할 것 같은데
+// 이미지 수정을 위해서는 기존 파일 이름이 있어야 가능하므로 저장!

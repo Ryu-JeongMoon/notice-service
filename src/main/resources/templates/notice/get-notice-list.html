@@ -25,13 +25,14 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="notice : ${noticeList}">
-                <td th:text="${notice.id}"></td>
-                <td><a class="text-primary" th:text="${notice.title}" th:onclick="|javascript:getOne('${notice.id}')|"></a></td>
-                <td th:text="${notice.content}"></td>
-                <td th:text="${#temporals.format(notice.createdDateTime, 'yyyy.MM.dd HH:mm')}"></td>
-                <td th:text="${notice.hit}"></td>
-                <td th:text="${notice.username}"></td>
+            <tr th:each="noticeResponse : ${noticeResponses}">
+                <td th:text="${noticeResponse.id}"></td>
+                <td><a class="text-primary" th:text="${noticeResponse.title}"
+                       th:onclick="|javascript:getOne('${noticeResponse.id}')|"></a></td>
+                <td th:text="${noticeResponse.content}"></td>
+                <td th:text="${#temporals.format(noticeResponse.createdDateTime, 'yyyy.MM.dd HH:mm')}"></td>
+                <td th:text="${noticeResponse.hit}"></td>
+                <td th:text="${noticeResponse.userResponse.username}"></td>
             </tr>
             </tbody>
         </table>

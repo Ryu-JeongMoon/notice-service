@@ -11,12 +11,12 @@ import com.example.noticeservice.domain.user.entity.dto.request.UserRequest;
 import com.example.noticeservice.domain.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,8 +65,8 @@ class NoticeServiceTest {
     @Test
     @DisplayName("게시글 다건 조회")
     void getNotices() {
-        List<NoticeResponse> notices = noticeService.getNotices(pageRequest);
-        assertThat(notices.size()).isEqualTo(1);
+        Page<NoticeResponse> notices = noticeService.getNotices(pageRequest);
+        assertThat(notices.getTotalElements()).isEqualTo(1);
     }
 
     @Test
@@ -97,8 +97,8 @@ class NoticeServiceTest {
             .build();
         noticeService.create(noticeRequest, Collections.emptyList());
 
-        List<NoticeResponse> notices = noticeService.getNotices(pageRequest);
-        assertThat(notices.size()).isEqualTo(2);
+        Page<NoticeResponse> notices = noticeService.getNotices(pageRequest);
+        assertThat(notices.getTotalElements()).isEqualTo(2);
     }
 
     @Test
@@ -121,7 +121,7 @@ class NoticeServiceTest {
     @DisplayName("게시글 삭제")
     void delete() {
         noticeService.delete(NOTICE_ID);
-        List<NoticeResponse> notices = noticeService.getNotices(pageRequest);
-        assertThat(notices.size()).isEqualTo(0);
+        Page<NoticeResponse> notices = noticeService.getNotices(pageRequest);
+        assertThat(notices.getTotalElements()).isEqualTo(0);
     }
 }

@@ -44,8 +44,8 @@
         </div>
         <hr>
         <div class="form-group">
+            <button class="btn btn-warning" type="submit">Submit</button>
             <button class="btn btn-primary" type="button" onclick="create(event)">Create</button>
-            <button class="btn btn-primary" type="submit">Submit</button>
             <button class="btn btn-info" type="button" onclick="getNoticeList()">Back</button>
         </div>
     </form>
@@ -58,7 +58,6 @@
         event.preventDefault();
 
         const form = document.uploadForm;
-        // const form = document.getElementsByName("uploadForm").values();
         const data = new FormData(form);
 
         try {
@@ -67,8 +66,12 @@
                 body: data,
                 headers: {},
             }).then((response) => {
-                if (response.status === 200) {
-                    location.href = "/notices"
+                if (response.status === 201) {
+                    if (confirm('게시글이 작성되었습니다')) {
+                        location.href = "/notices";
+                    } else {
+                        location.href = "/notices";
+                    }
                 }
             });
         } catch (error) {

@@ -11,8 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ImageResponse {
 
-    private String origFileName;
-    private String fileName;
-    private String filePath;
+    private Long id;
+
     private Long fileSize;
+
+    private String filePath;
+
+    private String fileName;
+
+    private String originalFileName;
 }

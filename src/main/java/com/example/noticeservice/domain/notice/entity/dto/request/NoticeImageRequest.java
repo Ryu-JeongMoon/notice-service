@@ -1,8 +1,12 @@
 package com.example.noticeservice.domain.notice.entity.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import javax.persistence.Lob;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,10 +22,13 @@ public class NoticeImageRequest {
 
     private String title;
 
+    @Lob
     private String content;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private String startDateTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private String endDateTime;
 
     private List<MultipartFile> files;
