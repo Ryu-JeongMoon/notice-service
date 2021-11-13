@@ -94,16 +94,30 @@ public class NoticeViewController {
 
         List<ImageResponse> imageResponses = requestImages(noticeId);
 
-        for (ImageResponse imageResponse : imageResponses) {
-            System.out.println("imageResponse.getFilePath() = " + imageResponse.getFilePath());
-        }
-
         model.addAttribute("noticeResponse", noticeResponse);
         model.addAttribute("imageResponses", imageResponses);
         return "notice/get-notice";
     }
 
-    public List<ImageResponse> requestImages(Long noticeId) {
+    private NoticeResponse requestNotice(Long noticeId) {
+        JSONObject jsonObject = webClient.get()
+            .uri("/api/notices/" + noticeId)
+            .retrieve()
+            .bodyToMono(JSONObject.class)
+            .block();
+
+        return NoticeResponse.builder()
+            .id(Long.valueOf(jsonObject.getAsString("id")))
+            .title(jsonObject.getAsString("title"))
+            .content(jsonObject.getAsString("content"))
+            .hit(Integer.parseInt(jsonObject.getAsString("hit")))
+            .userResponse(
+                UserResponse.from(
+                    (String) objectMapper.convertValue(jsonObject.get("userResponse"), LinkedHashMap.class).get("username")))
+            .build();
+    }
+
+    private List<ImageResponse> requestImages(Long noticeId) {
         JSONObject jsonImagesResult = webClient.get()
             .uri("/api/images/" + noticeId)
             .retrieve()
@@ -127,24 +141,6 @@ public class NoticeViewController {
                 .id((long) (int) o.get("id"))
                 .build())
             .collect(Collectors.toList());
-    }
-
-    private NoticeResponse requestNotice(Long noticeId) {
-        JSONObject jsonObject = webClient.get()
-            .uri("/api/notices/" + noticeId)
-            .retrieve()
-            .bodyToMono(JSONObject.class)
-            .block();
-
-        return NoticeResponse.builder()
-            .id(Long.valueOf(jsonObject.getAsString("id")))
-            .title(jsonObject.getAsString("title"))
-            .content(jsonObject.getAsString("content"))
-            .hit(Integer.parseInt(jsonObject.getAsString("hit")))
-            .userResponse(
-                UserResponse.from(
-                    (String) objectMapper.convertValue(jsonObject.get("userResponse"), LinkedHashMap.class).get("username")))
-            .build();
     }
 
     @GetMapping("/create")
@@ -183,6 +179,9 @@ public class NoticeViewController {
             .filter(HttpStatus::is2xxSuccessful)
             .map(httpStatus -> "redirect:/notices/" + noticeId)
             .block();
+    }
+}
+
 //        return webClient.patch()
 //            .uri("/api/notices/" + noticeId)
 //            .contentType(MediaType.APPLICATION_JSON)
@@ -192,6 +191,3 @@ public class NoticeViewController {
 //            .filter(HttpStatus::is2xxSuccessful)
 //            .map(httpStatus -> "redirect:/notices/" + noticeId)
 //            .block();
-    }
-}
-

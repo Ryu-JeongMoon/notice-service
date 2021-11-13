@@ -1,12 +1,10 @@
 package com.example.noticeservice.service;
 
 import com.example.noticeservice.domain.image.entity.Image;
-import com.example.noticeservice.domain.image.repository.ImageRepository;
 import com.example.noticeservice.domain.notice.entity.Notice;
 import com.example.noticeservice.domain.notice.entity.Status;
 import com.example.noticeservice.domain.notice.entity.dto.request.NoticeRequest;
 import com.example.noticeservice.domain.notice.entity.dto.response.NoticeResponse;
-import com.example.noticeservice.domain.notice.mapper.NoticeImageResponseMapper;
 import com.example.noticeservice.domain.notice.mapper.NoticeRequestMapper;
 import com.example.noticeservice.domain.notice.mapper.NoticeResponseMapper;
 import com.example.noticeservice.domain.notice.repository.NoticeRepository;
@@ -14,12 +12,9 @@ import com.example.noticeservice.domain.user.entity.User;
 import com.example.noticeservice.domain.user.repository.UserRepository;
 import com.example.noticeservice.util.Messages;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,24 +26,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class NoticeService {
 
+    private final ImageProcessor imageProcessor;
+    private final UserRepository userRepository;
     private final NoticeRepository noticeRepository;
     private final NoticeRequestMapper requestMapper;
     private final NoticeResponseMapper responseMapper;
-    private final NoticeImageResponseMapper imageResponseMapper;
-    private final ImageProcessor imageProcessor;
-    private final ImageRepository imageRepository;
-    private final UserRepository userRepository;
 
     // 대용량 트래픽을 처리하기 위한 Redis 도입을 고려했으나 페이징 형태로 결과를 보여주기 때문에
     // ArrayList 에서의 삭제와 같이 중간에 하나만 삭제하더라도 그 뒤에 있는 것들이 전부 shift 되어야 하기 때문에
     // 페이징과는 궁합이 좋지 않아보여 도입하지 않기로 함
-//    @Transactional(readOnly = true)
-//    public List<NoticeResponse> getNotices(Pageable pageable) {
-//        List<Notice> noticeList = noticeRepository.findByPageAndStatus(pageable, Status.ACTIVE);
-//        List<NoticeResponse> noticeResponseList = responseMapper.toDtoList(noticeList);
-//        return noticeResponseList;
-//    }
-
     @Transactional(readOnly = true)
     public Page<NoticeResponse> getNotices(Pageable pageable) {
         return noticeRepository.findByStatus(pageable, Status.ACTIVE);
@@ -74,6 +60,7 @@ public class NoticeService {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException(Messages.USER_NOT_FOUND));
 
+        noticeRequest = convertBlankToNull(noticeRequest);
         Notice notice = requestMapper.toEntity(noticeRequest);
         notice.setUser(user);
 
@@ -92,7 +79,7 @@ public class NoticeService {
         Notice notice = noticeRepository.findByIdAndStatus(id, Status.ACTIVE)
             .orElseThrow(() -> new EntityNotFoundException(Messages.NOTICE_NOT_FOUND));
 
-        convertBlankToNull(noticeRequest);
+        noticeRequest = convertBlankToNull(noticeRequest);
 
         List<Image> images = imageProcessor.parse(files);
         notice.addImages(images);
@@ -100,7 +87,9 @@ public class NoticeService {
         requestMapper.updateFromDto(noticeRequest, notice);
     }
 
-    private void convertBlankToNull(NoticeRequest noticeRequest) {
+    // title, content 빈 문자열로 들어오는 경우, 매핑되어버려 DB에 빈 값으로 저장됨
+    // 빈 문자열로 들어오는 경우 Mapstruct 에 의해 매핑되지 않도록 하려면 null 로 변환해줘야 함
+    private NoticeRequest convertBlankToNull(NoticeRequest noticeRequest) {
         String title = noticeRequest.getTitle();
         title = StringUtils.hasText(title) ? title : null;
         noticeRequest.setTitle(title);
@@ -108,6 +97,8 @@ public class NoticeService {
         String content = noticeRequest.getContent();
         content = StringUtils.hasText(content) ? content : null;
         noticeRequest.setContent(content);
+
+        return noticeRequest;
     }
 
     @Transactional

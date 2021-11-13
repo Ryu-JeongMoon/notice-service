@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="container">
-    <h2>Edit</h2><br/><br/>
+    <h2>Edit Page</h2><br/><br/>
     <div class="table-responsive">
         <form id="uploadForm" name="uploadForm"
               th:field="uploadForm"
@@ -84,8 +84,8 @@
                         <td>
                             <img class="img-responsive" th:src="|/images${imageResponse.filePath}/${imageResponse.fileName}|"
                                  alt="">
-                            <button type="button" class="btn btn-danger" th:text="Delete this image"
-                                    th:onclick="'javascript:deleteImage(' + ${imageResponse.id} + ');'">
+                            <button type="button" class="btn btn-danger"
+                                    th:onclick="'javascript:deleteImage(' + ${imageResponse.id} + ');'">Delete this image
                             </button>
                         </td>
                     </tr>

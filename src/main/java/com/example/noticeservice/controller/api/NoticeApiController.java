@@ -12,10 +12,7 @@ import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -24,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,7 +78,7 @@ public class NoticeApiController {
     // v2 - REST 형식을 지키기 위해 ViewController 를 거쳐 webClient 요청 후 ApiController 에서 반환으로 변경
     // v3 - ViewController 거쳐서 오면 CodecException 발생, Post 요청 받아 직접 처리하는 걸로 변경, webclient 에러로 추정 추후 보완 필요
     // v4 - POST, PATCH 둘다 사용, Post 로 async-await 요청을 받고, Patch 로 ViewController 요청 받아 처리
-    @RequestMapping(value = "/{noticeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+    @RequestMapping(value = "/{noticeId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE},
         method = {RequestMethod.POST, RequestMethod.PATCH})
     public ResponseEntity editNotice(@PathVariable Long noticeId, @ModelAttribute NoticeImageRequest noticeImageRequest)
         throws Exception {
