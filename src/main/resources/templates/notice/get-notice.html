@@ -28,7 +28,8 @@
                     <td id="id" th:text="${noticeResponse.id}"></td>
                     <td id="title" th:text="${noticeResponse.title}"></td>
                     <td id="content" th:text="${noticeResponse.content}"></td>
-                    <td id="createdDateTime" th:text="${noticeResponse.createdDateTime}"></td>
+                    <td id="createdDateTime"
+                        th:text="${#temporals.format(noticeResponse.createdDateTime, 'yyyy.MM.dd HH:mm')}"></td>
                     <td id="hit" th:text="${noticeResponse.hit}"></td>
                     <td id="username" th:text="${noticeResponse.userResponse.username}"></td>
                 </tr>
@@ -82,6 +83,8 @@
                 }).then((response) => {
                     if (response.status === 204 && confirm('게시글이 삭제되었습니다')) {
                         location.href = "/notices"
+                    } else {
+                        alert('작성자 본인 외에는 삭제할 수 없습니다');
                     }
                 });
             } catch (error) {

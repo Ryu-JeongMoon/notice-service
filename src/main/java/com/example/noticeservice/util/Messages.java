@@ -6,5 +6,6 @@ public class Messages {
     public static final String NOTICE_NOT_FOUND = "존재하지 않는 게시글입니다";
     public static final String DEFAULT_URL = "http://localhost:8080";
     public static final String NOT_PROPER_EXTENSION = "확장자가 올바르지 않습니다";
+    public static final String NOT_ENOUGH_AUTHORIZATION = "작성자 본인 외에는 삭제할 수 없습니다";
 
 }

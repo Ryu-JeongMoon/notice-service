@@ -9,7 +9,9 @@ import com.example.noticeservice.util.Messages;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -91,7 +93,6 @@ public class NoticeViewController {
     @GetMapping("/{noticeId}")
     public String getForm(@PathVariable Long noticeId, Model model) {
         NoticeResponse noticeResponse = requestNotice(noticeId);
-
         List<ImageResponse> imageResponses = requestImages(noticeId);
 
         model.addAttribute("noticeResponse", noticeResponse);
@@ -110,6 +111,9 @@ public class NoticeViewController {
             .id(Long.valueOf(jsonObject.getAsString("id")))
             .title(jsonObject.getAsString("title"))
             .content(jsonObject.getAsString("content"))
+            .endDateTime(LocalDateTime.parse(jsonObject.getAsString("endDateTime")))
+            .startDateTime(LocalDateTime.parse(jsonObject.getAsString("startDateTime")))
+            .createdDateTime(LocalDateTime.parse(jsonObject.getAsString("createdDateTime")))
             .hit(Integer.parseInt(jsonObject.getAsString("hit")))
             .userResponse(
                 UserResponse.from(

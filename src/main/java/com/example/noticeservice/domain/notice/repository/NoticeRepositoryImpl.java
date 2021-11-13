@@ -43,7 +43,8 @@ public class NoticeRepositoryImpl implements CustomNoticeRepository {
         QueryResults<NoticeResponse> results =
             queryFactory
                 .select(new QNoticeResponse(
-                    notice.id, notice.title, notice.content, notice.createdDateTime, notice.hit, notice.user.username))
+                    notice.id, notice.title, notice.content, notice.hit, notice.user.username,
+                    notice.endDateTime ,notice.startDateTime,notice.createdDateTime))
                 .from(notice)
                 .leftJoin(notice.user)
                 .where(notice.status.eq(status))

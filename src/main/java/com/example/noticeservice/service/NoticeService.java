@@ -16,6 +16,7 @@ import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +80,9 @@ public class NoticeService {
         Notice notice = noticeRepository.findByIdAndStatus(id, Status.ACTIVE)
             .orElseThrow(() -> new EntityNotFoundException(Messages.NOTICE_NOT_FOUND));
 
+        String username = notice.getUser().getUsername();
+        isWriter(username);
+
         noticeRequest = convertBlankToNull(noticeRequest);
 
         List<Image> images = imageProcessor.parse(files);
@@ -103,9 +107,22 @@ public class NoticeService {
 
     @Transactional
     public void delete(Long id) {
-        Notice notice = noticeRepository.findById(id)
+        Notice notice = noticeRepository.findByIdAndStatus(id, Status.ACTIVE)
             .orElseThrow(() -> new EntityNotFoundException(Messages.NOTICE_NOT_FOUND));
 
+        String username = notice.getUser().getUsername();
+        isWriter(username);
+
         notice.changeStatus();
+    }
+
+    // 본인 외에 삭제할 수 없도록 작성자 체크
+    // 어드민을 위한 삭제 기능을 추가하기 위해서는 조건 검사에 어드민 이름 추가
+    private void isWriter(String username) {
+        String loginUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (!username.equals(loginUsername)) {
+            throw new AccessDeniedException(Messages.NOT_ENOUGH_AUTHORIZATION);
+        }
     }
 }

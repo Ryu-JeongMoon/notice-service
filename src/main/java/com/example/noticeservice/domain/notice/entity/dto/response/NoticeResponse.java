@@ -20,6 +20,10 @@ public class NoticeResponse {
 
     private String content;
 
+    private LocalDateTime endDateTime;
+
+    private LocalDateTime startDateTime;
+
     private LocalDateTime createdDateTime;
 
     private int hit;
@@ -27,11 +31,14 @@ public class NoticeResponse {
     private UserResponse userResponse;
 
     @QueryProjection
-    public NoticeResponse(Long id, String title, String content, LocalDateTime createdDateTime, int hit, String username) {
+    public NoticeResponse(Long id, String title, String content, int hit, String username,
+        LocalDateTime endDateTime, LocalDateTime startDateTime, LocalDateTime createdDateTime) {
         this.id = id;
         this.hit = hit;
         this.title = title;
         this.content = content;
+        this.endDateTime = endDateTime;
+        this.startDateTime = startDateTime;
         this.createdDateTime = createdDateTime;
         this.userResponse = UserResponse.from(username);
     }

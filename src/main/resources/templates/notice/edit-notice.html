@@ -41,10 +41,26 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="content" class="col-sm-10 control-label">startDateTime.</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control"
+                           th:placeholder="${#temporals.format(noticeResponse.startDateTime, 'yyyy.MM.dd HH:mm')}" disabled>
+                    <input id="startDateTime" class="form-control" type="datetime-local" th:field="*{startDateTime}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="content" class="col-sm-10 control-label">endDateTime.</label>
+                <div class="col-sm-10">
+                    <input class="form-control" th:type="text" disabled
+                           th:placeholder="${#temporals.format(noticeResponse.endDateTime, 'yyyy.MM.dd HH:mm')}">
+                    <input id="endDateTime" class="form-control" type="datetime-local" th:field="*{endDateTime}">
+                </div>
+            </div>
+            <div class=" form-group">
                 <label for="content" class="col-sm-10 control-label">createdDateTime.</label>
                 <div class="col-sm-10">
                     <input id="createdDateTime" class="form-control" type="text"
-                           th:value="${noticeResponse.createdDateTime}" disabled>
+                           th:placeholder="${#temporals.format(noticeResponse.createdDateTime, 'yyyy.MM.dd HH:mm')}" disabled>
                 </div>
             </div>
             <div class="form-group">
@@ -56,7 +72,8 @@
             <div class="form-group">
                 <label for="username" class="col-sm-10 control-label">username.</label>
                 <div class="col-sm-10">
-                    <input id="username" class="form-control" type="text" th:placeholder="${noticeResponse.userResponse.username}"
+                    <input id="username" class="form-control" type="text"
+                           th:placeholder="${noticeResponse.userResponse.username}"
                            disabled>
                 </div>
             </div>
@@ -107,29 +124,35 @@
     async function editNotice(event) {
         event.preventDefault();
 
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('content').value;
         const form = document.uploadForm;
         const data = new FormData(form);
 
-        try {
-            await fetch("/api/notices/" + noticeId, {
-                method: "POST",
-                body: data,
-                headers: {},
-            }).then((response) => {
-                if (response.status === 200) {
-                    if (confirm('게시글이 수정되었습니다')) {
-                        location.href = "/notices/" + noticeId;
+        if (title === '' || content === '') {
+            alert('입력 값이 올바르지 않습니다');
+        } else {
+            try {
+                await fetch("/api/notices/" + noticeId, {
+                    method: "POST",
+                    body: data,
+                    headers: {},
+                }).then((response) => {
+                    if (response.status === 200) {
+                        if (confirm('게시글이 수정되었습니다')) {
+                            location.href = "/notices/" + noticeId;
+                        } else {
+                            location.href = "/notices/" + noticeId;
+                        }
                     } else {
-                        location.href = "/notices/" + noticeId;
+                        alert('작성자 본인 외에는 수정할 수 없습니다');
                     }
-                } else {
-                    console.log(response);
-                    alert('올바른 값을 입력했는지 확인해주세요');
-                }
-            });
-        } catch (error) {
-            console.log(error);
-            alert('올바른 값을 입력했는지 확인해주세요');
+                });
+
+            } catch (error) {
+                console.log(error);
+                alert('올바른 값을 입력했는지 확인해주세요');
+            }
         }
     }
 

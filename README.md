@@ -45,12 +45,16 @@
 
 ### 게시글 조회 정보를 담은 조회 페이지
 #### 수정 페이지로 이동 가능하며 삭제 요청과 이전 페이지로 돌아가는 기능 포함
-<img width="1000" alt="Screen Shot 2021-11-13 at 17 44 55" src="https://user-images.githubusercontent.com/76534087/141612273-c94fec0f-9fc4-4755-9aca-767c4ca5c96d.png">
+<img width="1691" alt="Screen Shot 2021-11-13 at 23 10 17" src="https://user-images.githubusercontent.com/76534087/141646976-df84918d-c914-45d9-bb4f-d95c2c4a6496.png">
 <hr>
 
 ### 게시글 수정과 삭제 요청 가능한 수정 페이지
-#### 이미지 삭제는 비동기 처리로 따로 요청, 이미지 추가와 내용 수정은 Form 으로 한번에 요청
-<img width="1000" alt="Screen Shot 2021-11-13 at 17 43 07" src="https://user-images.githubusercontent.com/76534087/141612217-17e20012-ea6a-413c-bbf8-ac083c0ccfeb.png">
+#### 이미지 추가와 내용 수정은 Form 으로 한번에 요청<br> Edit 버튼은 비동기 요청으로 async-await POST 요청으로 전송<br> Submit 버튼은 POST로 ViewController로 데이터를 담아 보낸 후 ApiController로 PATCH 전송하는 방식
+<img width="1516" alt="Screen Shot 2021-11-13 at 23 04 56" src="https://user-images.githubusercontent.com/76534087/141646781-46adbbdb-7bab-4625-a85b-b18f6ff8e2e2.png">
+<hr>
+
+#### 이미지 삭제는 비동기 처리로 따로 요청
+<img width="1439" alt="Screen Shot 2021-11-13 at 23 05 06" src="https://user-images.githubusercontent.com/76534087/141646785-77e98a39-bb5b-48f2-8a75-fec641d0d086.png">
 <hr>
 
 ### 회원 가입 페이지
