@@ -1,4 +1,4 @@
-# RSupport 공지사항 관리 REST API 구현
+# 공지사항 관리 REST API 구현
 ## Stack
 - SpringBoot v2.6.7, JDK 11.0.10, Hibernate ORM core 5.4.32 final 기반
 - Spring MVC, HATEOAS - REST API 구현
