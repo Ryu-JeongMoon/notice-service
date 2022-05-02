@@ -13,7 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 class ImageProcessorTest {
 
-    private ImageProcessor imageProcessor = new ImageProcessor();
+    private final ImageCompressor imageCompressor = new ImageCompressor();
+    private final ImageProcessor imageProcessor = new ImageProcessor(imageCompressor);
 
     @Test
     @DisplayName("파일 없을 시 빈 리스트 반환")

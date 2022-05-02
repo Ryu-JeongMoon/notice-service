@@ -2,7 +2,7 @@ package com.example.noticeservice.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.noticeservice.config.JpaConfigTest;
+import com.example.noticeservice.config.JpaTestConfig;
 import com.example.noticeservice.domain.notice.entity.Notice;
 import com.example.noticeservice.domain.notice.repository.NoticeRepository;
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Import;
 
 @Log4j2
 @DataJpaTest
-@Import(JpaConfigTest.class)
+@Import(JpaTestConfig.class)
 class BaseEntityTest {
 
     @Autowired

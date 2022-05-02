@@ -1,6 +1,6 @@
 # RSupport 공지사항 관리 REST API 구현
 ## Stack
-- SpringBoot v2.5.6, JDK 11.0.10, Hibernate ORM core 5.4.32 final 기반
+- SpringBoot v2.6.7, JDK 11.0.10, Hibernate ORM core 5.4.32 final 기반
 - Spring MVC, HATEOAS - REST API 구현
 - Spring Data JPA, QueryDSL - DB 접근
 - Spring Security, Validation - 간단한 인증, 인가 구현 

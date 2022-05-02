@@ -3,11 +3,15 @@ package com.example.noticeservice.service;
 import com.example.noticeservice.domain.image.entity.Image;
 import com.example.noticeservice.util.Messages;
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,19 +21,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Log4j2
 @Component
+@RequiredArgsConstructor
 public class ImageProcessor {
 
-    // project root 경로에 이미지 저장
-    private static final String ABSOLUTE_PATH = new File("").getAbsolutePath() + File.separator + File.separator;
+    private final ImageCompressor imageCompressor;
 
-    // static/images 경로에 이미지 저장
     @Value("${custom.file.path}")
     private String PATH;
 
     // 파일첨부하지 않고 뷰에서 multipart/form-data 넘기면 files 에 "" 으로 들어와 빈 리스트로 들어오지 않는다
     // TEST 과정에서는 빈 리스트로 들어왔고 누군가 POSTMAN 같이 데이터를 조작해 직접 넘기면 빈 리스트 들어올 수 있기 때문에
     // 빈 리스트인지 확인하는 방어 코드 추가
-    public List<Image> parse(List<MultipartFile> files) throws Exception {
+    public List<Image> parse(List<MultipartFile> files) {
         if (CollectionUtils.isEmpty(files)) {
             log.warn("FAILED :: There is no files");
             return Collections.emptyList();
@@ -44,19 +47,19 @@ public class ImageProcessor {
         checkFileExistence(file);
 
         for (MultipartFile multipartFile : files) {
-            String originalFilename = multipartFile.getOriginalFilename();
 
+            String originalFilename = multipartFile.getOriginalFilename();
             if (!StringUtils.hasText(originalFilename)) {
                 log.warn("FAILED :: There is no files");
                 continue;
             }
 
-            String currentTimeString = getCurrentTimeString();
             String contentType = multipartFile.getContentType();
-            String fileNameWithoutExtension = originalFilename.substring(0, originalFilename.indexOf("."));
-
             checkFileExtension(multipartFile, contentType);
 
+            assert contentType != null;
+            String currentTimeString = getCurrentTimeString();
+            String fileNameWithoutExtension = originalFilename.substring(0, originalFilename.indexOf("."));
             String convertedFileExtension = getFileExtension(contentType);
             String fileName = currentTimeString + fileNameWithoutExtension + convertedFileExtension;
 
@@ -67,16 +70,25 @@ public class ImageProcessor {
                 .filePath(File.separator + currentDateString)
                 .fileSize(multipartFile.getSize())
                 .build();
-
             imageList.add(image);
 
-            file = new File(path + File.separator + fileName);
-            multipartFile.transferTo(file);
-            file.setWritable(true);
-            file.setReadable(true);
+            saveFile(path + File.separator + fileName, multipartFile);
         }
 
         return imageList;
+    }
+
+    private void saveFile(String pathname, MultipartFile multipartFile) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                imageCompressor.compressAndSave(multipartFile.getBytes(), pathname);
+                File file = new File(pathname);
+                file.setWritable(true);
+                file.setReadable(true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }, new ScheduledThreadPoolExecutor(12));
     }
 
     private void checkFileExistence(File file) {

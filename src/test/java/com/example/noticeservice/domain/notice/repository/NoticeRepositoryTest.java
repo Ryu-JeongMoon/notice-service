@@ -2,7 +2,7 @@ package com.example.noticeservice.domain.notice.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.noticeservice.config.JpaConfigTest;
+import com.example.noticeservice.config.JpaTestConfig;
 import com.example.noticeservice.domain.image.entity.Image;
 import com.example.noticeservice.domain.image.repository.ImageRepository;
 import com.example.noticeservice.domain.notice.entity.Notice;
@@ -21,7 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @DataJpaTest
-@Import(JpaConfigTest.class)
+@Import(JpaTestConfig.class)
 class NoticeRepositoryTest {
 
     private static Long NOTICE_ID_1;
